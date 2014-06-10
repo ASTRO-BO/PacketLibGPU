@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	/*
 	*   CUDA test 
 	*/
-	cout << ">> GPU test <<" << endl; 
+	cout << ">> A basic GPU test: simple add <<" << endl; 
 	cuda_function(23, 34);
 	cout << "** end test **" << endl;
 	
