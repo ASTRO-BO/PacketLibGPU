@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
 	cout << ">> GPU test <<" << endl; 
 	cuda_function(23, 34);
 	cout << "** end test **" << endl;
+	
 	unsigned long totbytes = 0;
 	unsigned long nops = 0;
 	
