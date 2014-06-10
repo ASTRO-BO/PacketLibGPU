@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	/*
 	*   CUDA test 
 	*/
-	cout << ">> A basic GPU test: simple add <<" << endl; 
+	cout << ">> GPU test: simple add <<" << endl; 
 	cuda_function(23, 34);
 	cout << "** end test **" << endl;
 	
@@ -172,7 +172,14 @@ int main(int argc, char *argv[]) {
 				}
 				cout << endl;
 				*/				
-				// Do something with the GPU here ...				
+				// Do something with the GPU here ...
+				
+				int numElements = 2048 * 40; // pixels * sample
+				size_t size = numElements * sizeof(word);				
+				word* h_data = (word *)malloc(size);; // host data		
+				cuda_function(23, 34);
+				free(h_data);
+						
 			}
 		}
 		endHertz(true, start, totbytes, nops);
