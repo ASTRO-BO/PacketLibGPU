@@ -1,8 +1,14 @@
+# Instal dir
+CTAGPU = $(HOME)/Works/CTA/PacketLibGPU-install
+
 # Compilers
 NVCC = nvcc
 CLANG = clang++
 
 all: packetlibgpu
+
+install: all
+	cp packetlibgpu $(CTAGPU)/bin
 
 packetlibgpu: cuda.o mac_clock_gettime.o main.o packetlibop.o
 	$(CLANG)  -m64 -fexceptions -Wall  -o packetlibgpu -L/usr/local/cuda/lib -lcudart -lpacket *.o
