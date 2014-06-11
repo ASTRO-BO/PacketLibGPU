@@ -74,14 +74,15 @@ struct CTADataHeaders {
 
 
 extern "C++" void cuda_function(int a, int b);
+extern "C++" void cuda_proc(word* data, int numElements);
 int main(int argc, char *argv[]) {
 	
 	/*
-	*   CUDA test 
+	*   CUDA simple test 
 	*/
-	cout << ">> GPU test: simple add <<" << endl; 
-	cuda_function(23, 34);
-	cout << "** end test **" << endl;
+	// cout << ">> GPU test: simple add <<" << endl; 
+	// cuda_function(23, 34);
+	// cout << "** end test **" << endl;
 	
 	unsigned long totbytes = 0;
 	unsigned long nops = 0;
@@ -152,7 +153,7 @@ int main(int argc, char *argv[]) {
 			{
 				dword packetSize = p->size();
 				totbytes += packetSize;
-				if (nops < 3) // Print just 2 events ...
+				if (nops < 0) // Control the printing ...
 				{
 					cout << "Event number: " << p->getPacketSourceDataField()->getFieldValue(indexEventNumber) << endl;
 					cout << "Number of pixels: " << p->getPacketSourceDataField()->getFieldValue(indexNPixels) << endl;
@@ -160,7 +161,11 @@ int main(int argc, char *argv[]) {
 					cout << "Number of bytes: " << packetSize << endl;				
 				}
 
-				word* cameraData =(word*)p->getData()->stream;	
+				word* cameraData =(word*)p->getData()->stream;
+				// GPU processing
+				int numElements = 2048 * 40; // pixels * sample 
+				cout << "Processing data ... ";
+				cuda_proc(cameraData, numElements);	
 				/*
 				for (word pixel=0; pixel < 2048; pixel++)
 				{
@@ -171,15 +176,18 @@ int main(int argc, char *argv[]) {
 					cout << endl;
 				}
 				cout << endl;
-				*/				
-				// Do something with the GPU here ...
+				*/
+				// Verify that the result vector is correct
 				
-				int numElements = 2048 * 40; // pixels * sample
-				size_t size = numElements * sizeof(word);				
-				word* h_data = (word *)malloc(size);; // host data		
-				cuda_function(23, 34);
-				free(h_data);
-						
+    			for (int i = 0; i < numElements; ++i)
+    			{
+        			if (cameraData[i] != 1)
+        			{
+            			fprintf(stderr, "Result verification failed at element %d!\n", i);
+            			exit(EXIT_FAILURE);
+        			}
+    			}								
+				cout << "Test PASSED." <<endl;		
 			}
 		}
 		endHertz(true, start, totbytes, nops);
