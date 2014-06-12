@@ -166,8 +166,8 @@ int main(int argc, char *argv[]) {
 				}
 				
 				// GPU processing
-				int numElements = dataSize/2; 
-				word testData[numElements]; // used to test the GPU results
+				word* testData = (word *)malloc(dataSize); // used to test the GPU results
+				int numElements = dataSize/sizeof(word); 
 				for (int i=0; i < numElements; ++i)
 				{
 					testData[i] = cameraData[i];
@@ -195,7 +195,8 @@ int main(int argc, char *argv[]) {
             			exit(EXIT_FAILURE);
         			}
     			}								
-				cout << "Test PASSED." <<endl;		
+				cout << "Test PASSED." <<endl;
+				free(testData); 		
 			}
 		}
 		endHertz(true, start, totbytes, nops);
