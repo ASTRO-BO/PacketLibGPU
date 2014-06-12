@@ -13,7 +13,7 @@ This demo does the followings steps:
 
 		* copy the array in the GPU memory
 
-		* Process tha data array in one GPU kernel (simply: r[i] <- a[i] - a[i] + 1)
+		* Process tha data array in one GPU kernel (simply: r[i] <- a[i] + 1)
 
 		* return the value
 
