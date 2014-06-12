@@ -18,7 +18,7 @@ __global__ void gpuproc(const word* A, word* B, int numElements)
 	// So simple because I use just one kernel, but using more ones is also simple
 	for (size_t i=0; i<numElements; i++)
 	{
-		B[i] = A[i] - A[i] + 1;
+		B[i] = A[i] + 1;
 	}
 }
 

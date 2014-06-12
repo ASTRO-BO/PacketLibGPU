@@ -151,19 +151,27 @@ int main(int argc, char *argv[]) {
 				cout << "Packet not recognized" << endl;
 			} else 
 			{
-				dword packetSize = p->size();
+				dword packetSize = p->size(); // Total packet size
+				word* cameraData = (word*)p->getData()->stream; // Data 
+				dword dataSize   = p->getData()->size(); 
+				
 				totbytes += packetSize;
-				if (nops < 0) // Control the printing ...
+				if (nops < 3) // Control the printing ...
 				{
 					cout << "Event number: " << p->getPacketSourceDataField()->getFieldValue(indexEventNumber) << endl;
 					cout << "Number of pixels: " << p->getPacketSourceDataField()->getFieldValue(indexNPixels) << endl;
 					cout << "Number of Samples: " << p->getPacketSourceDataField()->getFieldValue(indexNSamples) << endl;
-					cout << "Number of bytes: " << packetSize << endl;				
+					cout << "Number of bytes (total): " << packetSize << endl;
+					cout << "Number of bytes (data): "  << dataSize   << endl;				
 				}
-
-				word* cameraData =(word*)p->getData()->stream;
+				
 				// GPU processing
 				int numElements = 2048 * 40; // pixels * sample 
+				word testData[numElements]; // used to test the GPU processinf
+				for (int i=0; i < numElements; ++i)
+				{
+					testData[i] = cameraData[i];
+				} 
 				cout << "Processing data ... ";
 				cuda_proc(cameraData, numElements);	
 				/*
@@ -181,7 +189,7 @@ int main(int argc, char *argv[]) {
 				
     			for (int i = 0; i < numElements; ++i)
     			{
-        			if (cameraData[i] != 1)
+        			if (cameraData[i] - testData[i] != 1)
         			{
             			fprintf(stderr, "Result verification failed at element %d!\n", i);
             			exit(EXIT_FAILURE);
