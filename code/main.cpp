@@ -166,8 +166,8 @@ int main(int argc, char *argv[]) {
 				}
 				
 				// GPU processing
-				int numElements = 2048 * 40; // pixels * sample 
-				word testData[numElements]; // used to test the GPU processinf
+				int numElements = dataSize/2; 
+				word testData[numElements]; // used to test the GPU results
 				for (int i=0; i < numElements; ++i)
 				{
 					testData[i] = cameraData[i];

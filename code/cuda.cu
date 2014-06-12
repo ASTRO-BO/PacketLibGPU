@@ -115,19 +115,7 @@ void cuda_proc(word* h_data, int numElements)
         fprintf(stderr, "Failed to copy vector from device to host (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-    
-    // Verify that the result vector is correct
-    /* Verification moved in the main() file
-    for (int i = 0; i < numElements; ++i)
-    {
-        if (h_data[i] != 1)
-        {
-            fprintf(stderr, "Result verification failed at element %d!\n", i);
-            exit(EXIT_FAILURE);
-        }
-    }
-    */
-    
+        
     // Free device global memory
     err = cudaFree(d_A);
 
@@ -151,6 +139,8 @@ void cuda_proc(word* h_data, int numElements)
     // needed to ensure correct operation when the application is being
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
+    // TIME EXPENSIVE
+    /*
     err = cudaDeviceReset();
 
     if (err != cudaSuccess)
@@ -158,29 +148,6 @@ void cuda_proc(word* h_data, int numElements)
         fprintf(stderr, "Failed to deinitialize the device! error=%s\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
-
-    
-    /*
-    // Copy the host vector h_data in host memory to the device vector d_data in
-    // device memory 
-    err = cudaMemcpy(d_data, h_data, size, cudaMemcpyHostToDevice);
-
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to copy vector from host to device (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
-    
-    // Launch the CUDA Kernel
-    gpuproc<<<1, 1>>>(h_data, d_data, numElements);
-    err = cudaGetLastError();
-
-    if (err != cudaSuccess)
-    {
-        fprintf(stderr, "Failed to launch the kernel (error code %s)!\n", cudaGetErrorString(err));
-        exit(EXIT_FAILURE);
-    }
 	*/
-	
-	//printf("Test PASSED.\n");
+    
 }
