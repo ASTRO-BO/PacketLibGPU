@@ -9,15 +9,13 @@ This demo does the followings steps:
 
 	* for each data array:
 
-		* allocate the GPU device memory
+		* Allocate the GPU device memory
 
-		* copy the array in the GPU memory
+		* Copy the data array in the GPU memory
 
-		* Process tha data array in one GPU kernel (simply: r[i] <- a[i] + 1)
+		* Extract the signal with the sliding window method, implemented in both CPU and GPU
 
-		* return the value
-
-		* test the result
+		* Test the results
     
     The GPU processing can be parallelized using the kernel index in the device function.
     
