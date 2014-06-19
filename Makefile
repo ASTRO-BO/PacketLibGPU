@@ -10,7 +10,7 @@ all: packetlibgpu
 install: all
 	cp packetlibgpu $(CTAGPU)/bin
 
-packetlibgpu: cuda.o mac_clock_gettime.o main.o packetlibop.o
+packetlibgpu: cuda.o mac_clock_gettime.o main.o packetlibop.o sig_ext.o
 	$(CLANG)  -m64 -fexceptions -Wall  -o packetlibgpu -L/usr/local/cuda/lib -lcudart -lpacket *.o
 
 cuda.o: code/cuda.cu
@@ -24,6 +24,9 @@ main.o: code/main.cpp
 
 packetlibop.o: code/packetlibop.cpp
 	$(CLANG)  -m64 -fexceptions -Wall -I code  -c code/packetlibop.cpp
-
+	
+sig_ext.o: code/sig_ext.cpp
+	$(CLANG)  -m64 -fexceptions -Wall -I code  -c code/sig_ext.cpp
+	
 clean: 
 	rm -f *o packetlibgpu

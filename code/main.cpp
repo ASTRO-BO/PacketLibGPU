@@ -22,6 +22,7 @@
 
 #include "packetlibop.h"
 
+void sig_ext(word *data, int numElements, double *maximum, double *time);
 
 void swap(byte* stream, dword dim) {
 	
@@ -74,7 +75,7 @@ struct CTADataHeaders {
 
 
 extern "C++" void cuda_function(int a, int b);
-extern "C++" void cuda_proc(word* data, int numElements);
+extern "C++" void cuda_proc(word* data, double* maximum, double* time, int numElements);
 int main(int argc, char *argv[]) {
 	
 	/*
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
 		int indexNPixels = p->getPacketSourceDataField()->getFieldIndex("Number of pixels");
 		int indexNSamples = p->getPacketSourceDataField()->getFieldIndex("Number of samples");
 		
-		while(p = ips->readPacket()) {
+		while((p = ips->readPacket())) {
 			nops++;
 			if(p->getPacketID() == PACKETNOTRECOGNIZED)
 			{
@@ -165,15 +166,27 @@ int main(int argc, char *argv[]) {
 					cout << "Number of bytes (data): "  << dataSize   << endl;				
 				}
 				
+				int numElements = dataSize/sizeof(word); 
+				
+				// CPU processing
+				double maximum=0.;
+				double time=0.;
+				sig_ext(cameraData, numElements, &maximum, &time);
+				cout << "The CPU says: Maximum signal " << maximum << " ";
+				cout << "at time  " << time << endl;
+				
 				// GPU processing
 				word* testData = (word *)malloc(dataSize); // used to test the GPU results
-				int numElements = dataSize/sizeof(word); 
 				for (int i=0; i < numElements; ++i)
 				{
 					testData[i] = cameraData[i];
 				} 
-				cout << "Processing data ... ";
-				cuda_proc(cameraData, numElements);	
+				double maximum_gpu=0.;
+				double time_gpu=0.;				
+				cuda_proc(cameraData, &maximum_gpu, &time_gpu, numElements);
+				cout << "The GPU says: Maximum signal " << maximum_gpu << " ";
+				cout << "at time  " << time_gpu << endl;	
+				cout << "GPU verifying data ... ";
 				/*
 				for (word pixel=0; pixel < 2048; pixel++)
 				{
@@ -199,6 +212,7 @@ int main(int argc, char *argv[]) {
 				free(testData); 		
 			}
 		}
+		cout << endl << endl;
 		endHertz(true, start, totbytes, nops);
 	}
 	catch (PacketException* e)
