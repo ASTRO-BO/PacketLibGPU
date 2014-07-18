@@ -157,7 +157,7 @@ int main(int argc, char *argv[]) {
 				dword dataSize   = p->getData()->size(); 
 				
 				totbytes += packetSize;
-				if (nops < 3) // Control the printing ...
+				if (nops < 1) // Control the printing ...
 				{
 					cout << "Event number: " << p->getPacketSourceDataField()->getFieldValue(indexEventNumber) << endl;
 					cout << "Number of pixels: " << p->getPacketSourceDataField()->getFieldValue(indexNPixels) << endl;
