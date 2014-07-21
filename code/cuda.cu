@@ -18,44 +18,52 @@ __device__ void sig_ext_gpu(const word *data, int numElements, double *maximum, 
 {
 	const int maxSample=40, windowSize=9;
 	
-	*maximum =0.;
-	*time=0.;
-	int position = 0; 
-	double sum = 0.;
+	int i = blockDim.x * blockIdx.x + threadIdx.x;
+	int pixel = i * maxSample; 
+	
+	if ( i == 119 ) // i < 2048 in a real application. Edit this line to change the pixel number
+	{
+		*maximum =0.;
+		*time=0.;
+		int position = 0; 
+		double sum = 0.;
 		
-	// Maximum sum (sliding window search)
-	for (int sample = 0; sample < windowSize; ++sample)
-	{
-		sum += data[sample];
-	}
-	*maximum = sum;
-	for (int sample = 1; sample <= maxSample - windowSize; ++sample)
-	{
-		sum += data[windowSize + sample - 1] - data[sample - 1];
-		if (sum > *maximum)
+		// Maximum sum (sliding window search)
+		for (int sample = 0; sample < windowSize; ++sample)
 		{
-			*maximum = sum;
-			position = sample;
+			sum += data[pixel + sample];
 		}
+		*maximum = sum;
+		for (int sample = 1; sample <= maxSample - windowSize; ++sample)
+		{
+			sum += data[pixel + windowSize + sample - 1] - data[pixel + sample - 1];
+			if (sum > *maximum)
+			{
+				*maximum = sum;
+				position = sample;
+			}
+		}
+		// Time
+		sum = 0.;
+		for (int sample=0; sample < windowSize; ++sample)
+		{
+			sum += data[pixel + position + sample] * (position + sample);
+		}
+		*time = sum / *maximum;
 	}
-	// Time
-	sum = 0.;
-	for (int sample=0; sample < windowSize; ++sample)
-	{
-		sum += data[position + sample] * (position + sample);
-	}
-	*time = sum / *maximum;
 }
 
 
 
 __global__ void gpuproc(const word* A, word* B, double *maximum, double *time, int numElements)
 {
+	// TEST
 	// So simple because I'm using just one kernel in this test.
 	for (size_t i=0; i<numElements; i++)
 	{
 		B[i] = A[i] + 1;
 	}
+	 
 	// GPU processing
 	sig_ext_gpu(A, numElements, maximum, time);
 }
@@ -124,7 +132,10 @@ void cuda_proc(word* h_data, double* maximum, double* time, int numElements)
     }
     
     // Launch the CUDA Kernel
-    gpuproc<<<1, 1>>>(d_A, d_B, d_maximum, d_time, numElements);
+    int threadsPerBlock = 256;
+    int numPixels = 2048;
+    int blocksPerGrid =(numPixels + threadsPerBlock - 1) / threadsPerBlock;
+    gpuproc<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_maximum, d_time, numElements);
     err = cudaGetLastError();
 
     if (err != cudaSuccess)

@@ -3,21 +3,21 @@
 void sig_ext(word *data, int numElements, double *maximum, double *time)
 {
 	const int maxSample=40, windowSize=9;
+	int i(119); // Edit this line to change the pixel number
+	int pixel = i * maxSample; 
 	
 	*maximum =0.;
 	*time=0.;
 	int position = 0; 
 	double sum = 0.;
-	
-	// The first 40 elements of data array are the first sample
-	
+		
 	// Test
-	cout << endl << "First sample: ";
-	for (word pixel=0; pixel < 1; pixel++)
+	cout << endl << "Pixel no. " << i << " :";
+	for (word k=i; k <= i; k++)
 	{
 		for (word sample = 0; sample < maxSample; sample ++)
 		{
-			cout << data[pixel*40 + sample] << " ";
+			cout << data[k*40 + sample] << " ";
 		}
 		cout << endl;
 	}		
@@ -25,12 +25,12 @@ void sig_ext(word *data, int numElements, double *maximum, double *time)
 	// Maximum sum (sliding window search)
 	for (int sample = 0; sample < windowSize; ++sample)
 	{
-		sum += data[sample];
+		sum += data[pixel + sample];
 	}
 	*maximum = sum;
 	for (int sample = 1; sample <= maxSample - windowSize; ++sample)
 	{
-		sum += data[windowSize + sample - 1] - data[sample - 1];
+		sum += data[pixel + windowSize + sample - 1] - data[pixel + sample - 1];
 		if (sum > *maximum)
 		{
 			*maximum = sum;
@@ -41,7 +41,7 @@ void sig_ext(word *data, int numElements, double *maximum, double *time)
 	sum = 0.;
 	for (int sample=0; sample < windowSize; ++sample)
 	{
-		sum += data[position + sample] * (position + sample);
+		sum += data[pixel + position + sample] * (position + sample);
 	}
 	*time = sum / *maximum;
 }
