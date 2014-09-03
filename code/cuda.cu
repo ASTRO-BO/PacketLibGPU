@@ -21,7 +21,7 @@ __device__ void sig_ext_gpu(const word *data, int numElements, double *maximum, 
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	int pixel = i * maxSample; 
 	
-	if ( i == 119 ) // i < 2048 in a real application. Edit this line to change the pixel number
+	if ( i == 1119 ) // i < 2048 in a real application. Edit this line to change the pixel number
 	{
 		*maximum =0.;
 		*time=0.;
@@ -121,6 +121,11 @@ void cuda_proc(word* h_data, double* maximum, double* time, int numElements)
         exit(EXIT_FAILURE);
     }
     
+    // Timing using CUDA events
+    cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start);
     // Copy the host input vector A in host memory to the device input vectors in
     // device memory
     err = cudaMemcpy(d_A, h_data, size, cudaMemcpyHostToDevice);
@@ -173,6 +178,13 @@ void cuda_proc(word* h_data, double* maximum, double* time, int numElements)
         fprintf(stderr, "Failed to copy value from device to host (error code %s)!\n", cudaGetErrorString(err));
         exit(EXIT_FAILURE);
     }
+    
+    // Timing using CUDA events
+    cudaEventRecord(stop);
+    cudaEventSynchronize(stop);
+    float milliseconds = 0;
+    cudaEventElapsedTime(&milliseconds, start, stop);
+    printf("Run time on the GPU: %f milliseconds\n", milliseconds);
         
     // Free device global memory
     err = cudaFree(d_A);

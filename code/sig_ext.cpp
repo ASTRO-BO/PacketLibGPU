@@ -3,7 +3,7 @@
 void sig_ext(word *data, int numElements, double *maximum, double *time)
 {
 	const int maxSample=40, windowSize=9;
-	int i(119); // Edit this line to change the pixel number
+	int i(1119); // Edit this line to change the pixel number
 	int pixel = i * maxSample; 
 	
 	*maximum =0.;
